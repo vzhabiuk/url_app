@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Url viewer</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+    <link rel="text/javascript" href=" https://cdn.datatables.net/1.10.9/js/dataTables.bootstrap.min.js">
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+    <script type="text/javascript">
+
+    function refreshTable(){
+           $("#urlTable").dataTable().fnDestroy();
+           $("#urlTable").dataTable( {
+            "bDestroy": true,
+            "bProcessing": false,
+            "bServerSide": false,
+            "pageLength": 25,
+            "aaSorting": [[1, "desc"]],
+            "ajax": {
+            "url": "/tokens.json",
+            "type": "POST",
+             error: function(xhr,status,error) {
+               $('#alertBox').show()
+             }
+            },
+            "fnServerParams": function ( aoData ) {
+                aoData.push( {
+                "name": "url", "value": $("#urlField").val()} );
+            },
+            "aoColumns": [
+                { "mData": "elementName" },
+                { "mData": "frequency" },
+            ]
+        } );
+        }
+
+    $(document).ready(function() {
+        $('#btnSubmit').click(function () {
+         refreshTable();
+    });
+    } );
+    </script>
+</head>
+
+<body>
+<div class="container">
+    <form class="form-inline" role="form" onsubmit="refreshTable(); return false;">
+        <div class="form-group">
+            <label for="urlField">Url:</label>
+            <input type="text" name="urlField" id="urlField" value=""/> <br />
+        </div>
+        <input type="button" class="btn btn-default" id="btnSubmit" name="btnSubmit" value="Show tags">
+    </form>
+    <table width="70%" style="border: 3px;background: rgb(243, 244, 248);"><tr><td>
+        <table id="urlTable" class="display" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th>Element name</th>
+                <th>Frequency</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <th>Element name</th>
+                <th>Frequency</th>
+            </tr>
+            </tfoot>
+        </table>
+    </td></tr></table>
+    <div id="alertBox" class="alert alert-danger" style="display: none">
+        <a class="close" onclick="$('.alertBox').hide()" aria-label="close">&times;</a>
+        <strong>Error!</strong> Failed to fetch url.
+    </div>
+</div>
+</body>
+</html>
